@@ -14,7 +14,7 @@ intents.reactions = True
 intents.guilds = True
 intents.members = True
 
-
+token = os.environ['token']
 
 
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -325,4 +325,4 @@ async def ehelp(ctx):
                 
 
 
-bot.run("MTIzMTc4Nzg5NzYwMzIyNzcwMA.G0N_Ya.byWtc3VqdL0rSIA4wYMQ817f21MNXHgUM71tTQ")
+bot.run(token)
