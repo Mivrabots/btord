@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import random
 import os
+import asyncio
 #import the db for the bot 
 import sqlite3
 from keep_alive import keep_alive
