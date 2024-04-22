@@ -47,6 +47,46 @@ def update_balance(user_id, amount):
     cursor.execute('INSERT OR REPLACE INTO balances (user_id, balance) VALUES (?, ?)', (user_id, amount))
     conn.commit()
 
+#the bot do random giveaway 
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+    if message.content.startswith('!giveaway'):
+        # Check if the user has the "Giveaway Host" role
+        giveaway_host_role = discord.utils.get(message.guild.roles, name="Giveaway host" )
+        if giveaway_host_role in message.author.roles:
+            # Extract the prize from the message
+            prize = message.content.split(' ', 1)[1]
+            # Send a message to the channel announcing the giveaway
+            giveaway_message = await message.channel.send(f'🎉 **GIVEAWAY** � {prize} � 🎉\nReact with 🎉 to enter!')
+            # Add the reaction to the message
+            await giveaway_message.add_reaction('🎉')
+            # Wait for the reaction to be added        
+            def check(reaction, user):  
+                return str(reaction.emoji) == '🎉' and not user.bot  
+            try:
+                reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                await message.channel.send('Giveaway ended. No one entered.')
+            else:
+                # Select a random winner from the users who reacted
+                winner = random.choice(reaction.users)
+                # Send a message to the channel announcing the winner
+                await message.channel.send(f'🎉 **GIVEAWAY ENDED** � {winner}')
+                # Update the user's balance
+                update_balance(winner.id, get_balance(winner.id) + 100)
+                # Send a message to the winner with their balance      
+                await winner.send(f'Congratulations, you won the giveaway and received 100 coins! Your balance is now {get_balance(winner.id)} coins.')  
+        else:
+            await message.channel.send('You do not have permission to host a giveaway.')  
+
+
+
+
+
+
+
 # ping command to ckeck the bot ping as a embed 
 @bot.command()
 async def ping(ctx):
